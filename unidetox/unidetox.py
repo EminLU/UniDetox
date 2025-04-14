@@ -117,7 +117,7 @@ class UniDetoxFineTuner:
         output_dir: str,
         alpha: float = 0.05,
         lr: float = 5e-5,
-        finetune_seed: int = 42,
+        finetune_seed: int = 1234,
         llama2_token: str = None
     ):
         self.model_name = model_name
@@ -153,8 +153,7 @@ class UniDetoxFineTuner:
         from self.detox_text_dir, then fine-tune self.model_name for up to max_steps.
         """
         for step in checkpoint_steps:
-            # csv_name = f"generated_texts_alpha={self.alpha}_beta={beta}_checkpoint-{step}.csv"
-            csv_name = "generated_texts_gpt2-xl.csv"
+            csv_name = "generated_texts_alpha=0.1_beta=inf_checkpoint-15126.csv"
             csv_path = os.path.join(self.detox_text_dir, csv_name)
 
             if not os.path.exists(csv_path):
@@ -1053,41 +1052,53 @@ class UniDetoxEvaluator:
         accuracy = self._evaluate_mmlu_single_model(dataset, model, self.tokenizer, shots=shots)
         print(f"MMLU few-shot accuracy for baseline [{self.model_name}]: {accuracy*100:.2f}%")
 
+import argparse
 def main():
     parser = argparse.ArgumentParser(description="UniDetox Fine-tuning/Evaluation.")
     parser.add_argument("--mode", type=str, choices=["finetune","evaluate"], default="finetune")
+    parser.add_argument("--auth_token", type=str, default=None, help="Hugging Face auth token.")
+    parser.add_argument("--target_model", type=str, default='facebook/opt-6.7b', help="target model you want to detoxify.")
     # add more arguments as needed...
     args = parser.parse_args()
 
     if args.mode == "finetune":
         # example usage
         fine_tuner = UniDetoxFineTuner(
-            model_name="gpt2-xl",
-            tokenizer_name="gpt2-xl",
+            model_name=args.target_model,
+            tokenizer_name=args.target_model,
             detox_text_dir="./distilled_text",
             output_dir="./fine_tuned_model",
             alpha=0.1,
-            lr=5e-5
+            lr=5e-5, 
+            finetune_seed=42, 
         )
         fine_tuner.run_finetuning(
             checkpoint_steps=[15126],  # or however you're naming your steps
             beta="inf",
-            max_steps=2000,
+            max_steps=3000,
             batch_size=8
         )
 
     else:
         # do evaluation
         evaluator = UniDetoxEvaluator(
-            model_name="gpt2-xl",
-            output_dir=f'./eval_outputs',
+            model_name=args.target_model,
+            output_dir=f'./eval_outputs/{args.target_model.split("/")[-1]}',
             eval_seed=42,   # The base seed for multiple runs
-            llama2_token='...'
+            llama2_token=args.auth_token
         )
         evaluator.prepare_prompts(split="test")
         evaluator.evaluate_finetuned_models(mode='test', 
-                                            main_checkpoint_dirs=[f'./fine_tuned_model/gpt2-xl_detoxed_alpha=0.1_beta=inf_checkpoint-15126/checkpoint-2000'], 
+                                            # main_checkpoint_dirs=[f'./fine_tuned_model/{args.target_model.split("/")[-1]}_detoxed_alpha=0.1_beta=inf_checkpoint-15126/checkpoint-3000'], 
+                                            main_checkpoint_dirs=[f'/home/h-lu/model/UniDetox_ICLR_2025/detoxed_model_lr5e-5_alpha0.1_1234/{args.target_model.split("/")[-1]}_detoxed_alpha=0.1_beta=inf_checkpoint-15126/checkpoint-3000'],
                                             alpha=0.1, beta='inf', num_runs=5)
+        evaluator.aggregate_finetuned_toxicity(mode='test', alpha=0.1, beta='inf', sub_checkpoint='checkpoint-3000', num_runs=5)
+        evaluator.aggregate_finetuned_perplexity(mode='test', alpha=0.1, beta='inf', sub_checkpoint='checkpoint-3000', num_runs=5)
+        evaluator.aggregate_finetuned_distinctness(mode='test', alpha=0.1, beta='inf', sub_checkpoint='checkpoint-3000', num_runs=5)
+        evaluator.evaluate_mmlu_finetuned(dataset=load_dataset("cais/mmlu", 'all'), 
+                                  # main_checkpoint_dirs=[f'./fine_tuned_model/{args.target_model.split("/")[-1]}_detoxed_alpha=0.1_beta=inf_checkpoint-15126/checkpoint-3000'], 
+                                          main_checkpoint_dirs=[f'/home/h-lu/model/UniDetox_ICLR_2025/detoxed_model_lr5e-5_alpha0.1_1234/{args.target_model.split("/")[-1]}_detoxed_alpha=0.1_beta=inf_checkpoint-15126/checkpoint-3000'],
+                                  shots=1)
 
 if __name__ == "__main__":
     main()

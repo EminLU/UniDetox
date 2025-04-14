@@ -5,12 +5,13 @@
 conda activate unidetox  # name matches environment.yml
 
 # 2) Run the Python script with arguments
-python -m unidetox.toxic_gpt2_finetune_and_distill \
+python3 -m unidetox.toxic_gpt2_finetune_and_distill \
   --base_model_name gpt2-xl \
   --output_dir ./toxic_model \
   --epochs 3 \
   --lr 1e-5 \
   --batch_size 4 \
-  --random_seed 123 \
+  --random_seed_training 123 \
+  --random_seed_distilling 1234 \
   --alpha_list 0.1 \
   --beta_list inf

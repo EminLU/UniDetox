@@ -62,7 +62,7 @@ def load_and_filter_dghs(
 
     # Load
     dghs = load_dataset("LennardZuendorf/Dynamically-Generated-Hate-Speech-Dataset",
-                        use_auth_token=auth_token)
+                         token=auth_token)
 
     # Convert to filter
     def filter_func(example):
