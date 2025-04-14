@@ -12,6 +12,11 @@ Huimin Lu<sup>1</sup>, Masaru Isonuma<sup>1,2,3</sup>, Junichiro Mori<sup>1,4</s
 
 ---
 
+<!-- Display an image at the top of the README -->
+<p align="center">
+  <img src="./github.png" alt="GitHub Logo" width="200">
+</p>
+
 ## 0. Reproduce the Environment
 
 ```bash
