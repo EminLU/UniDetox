@@ -10,11 +10,11 @@ Huimin Lu<sup>1</sup>, Masaru Isonuma<sup>1,2,3</sup>, Junichiro Mori<sup>1,4</s
 <sup>3</sup>National Institute of Informatics (NII)  
 <sup>4</sup>RIKEN AIP  
 
----
-
 <p align="center">
   <img src="./github.png" alt="GitHub Logo" style="max-width:100%;">
 </p>
+
+---
 
 ## 0. Reproduce the Environment
 
