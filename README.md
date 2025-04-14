@@ -34,7 +34,7 @@ To ensure the conda environment’s libraries take priority, you can do:
 export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
 ```
 
-## 1. Obtain a Toxic Model and Distill Detoxifying Data
+## 1+2. Obtain a Toxic Model and Distill Detoxifying Data
 ```bash
 python -m unidetox.toxic_gpt2_finetune_and_distill \
   --base_model_name gpt2-xl \
@@ -45,7 +45,7 @@ python -m unidetox.toxic_gpt2_finetune_and_distill \
   --batch_size 4
 ```
 
-  ## 2. Fine-tune Model(s) for Detoxification
+  ## 3. Fine-tune Model(s) for Detoxification
 
 ```bash
   python -m unidetox.unidetox --mode finetune \
@@ -54,7 +54,7 @@ python -m unidetox.toxic_gpt2_finetune_and_distill \
   --target_model "gpt2-xl"
 ```
 
-  ## 3. Reproduce our Evaluation Results of GPT-2 XL
+  ## Reproduce our Evaluation Results of GPT-2 XL
 
 ```bash
   python -m unidetox.unidetox --mode evaluate \
