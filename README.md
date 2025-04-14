@@ -63,7 +63,7 @@ python -m unidetox.toxic_gpt2_finetune_and_distill \
   --target_model "gpt2-xl"
 ```
 
-If you find our work helpful, please cite our paper as follows:
+If you find our work helpful, please cite our paper:
 
 ```bibtext
 @inproceedings{
